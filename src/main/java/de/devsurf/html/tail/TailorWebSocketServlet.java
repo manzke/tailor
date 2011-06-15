@@ -66,14 +66,7 @@ public class TailorWebSocketServlet extends WebSocketServlet {
 
 		@Override
 		public void onClose(int closeCode, String message) {
-			if (_log != null) {
-				try {
-					_log.close();
-				} catch (IOException e) {
-					LOGGER.info(e.getMessage(), e);
-				}
-			}
-			_members.remove(this);
+			destroy();
 		}
 
 		@Override
