@@ -1,0 +1,199 @@
+<!doctype html>
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html lang="en" class="no-js">
+	<!--<![endif]-->
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<title>Tail-based by Web Sockets</title>
+		<meta name="description"
+			content="web-based Tail Client using Web Sockets">
+		<meta name="author" content="Daniel Manzke">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="shortcut icon" href="/favicon.ico">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<link rel="stylesheet" href="css/style.css?v=2">
+
+		<script src="js/libs/modernizr-1.7.min.js"></script>
+	</head>
+	<script type='text/javascript'>
+	if (!window.WebSocket)
+		alert("WebSocket not supported by this browser");
+
+	function $() {
+		return document.getElementById(arguments[0]);
+	}
+	function $F() {
+		return document.getElementById(arguments[0]).value;
+	}
+
+	function getKeyCode(ev) {
+		if (window.event)
+			return window.event.keyCode;
+		return ev.keyCode;
+	}
+
+	var server = {
+		connect : function(logfile, newOnly) {
+			var location = document.location.toString().replace('http://',
+					'ws://').replace('https://', 'wss://');
+			location = location + 'servlet/tailingwebsocket?logfile=' + logfile
+					+ '&newOnly=' + newOnly;
+
+			this._ws = new WebSocket(location);
+			this._ws.onopen = this._onopen;
+			this._ws.onmessage = this._onmessage;
+			this._ws.onclose = this._onclose;
+		},
+
+		disconnect : function() {
+			if (this._ws)
+				this._ws.close();
+		},
+
+		_onopen : function() {
+			server._send('websockets are open for communications!');
+		},
+
+		_send : function(message) {
+			if (this._ws)
+				this._ws.send(message);
+		},
+
+		send : function(text) {
+			if (text != null && text.length > 0)
+				server._send(text);
+		},
+
+		_onmessage : function(m) {
+			if (m.data) {
+				var messageBox = $('messageBox');
+				var spanText = document.createElement('span');
+				spanText.className = 'text';
+				spanText.innerHTML = m.data;
+				var lineBreak = document.createElement('br');
+				messageBox.appendChild(spanText);
+				messageBox.appendChild(lineBreak);
+				messageBox.scrollTop = messageBox.scrollHeight
+						- messageBox.clientHeight;
+			}
+		},
+
+		_onclose : function(m) {
+			this._ws = null;
+		}
+	};
+</script>
+	<!-- style type='text/css'>
+div {
+	border: 0px solid black;
+}
+
+div#messageBox {
+	clear: both;
+	width: 80%;
+	height: 500px;
+	overflow: auto;
+	background-color: #f0f0f0;
+	padding: 4px;
+	border: 1px solid black;
+}
+
+div#input {
+	clear: both;
+	width: 80%;
+	padding: 4px;
+	background-color: #e0e0e0;
+	border: 1px solid black;
+	border-top: 0px
+}
+
+div.hidden {
+	display: none;
+}
+
+span.alert {
+	font-style: italic;
+}
+</style-->
+	</head>
+	<body>
+		<p class="info">
+			Your HTML5 project is almost ready! Please check the
+			<a href="TODO.txt">TODO list</a>.
+		</p>
+		<div id="header-container">
+			<header class="wrapper">
+				<h1 id="title">
+					Your title
+				</h1>
+			</header>
+		</div>
+		<div id="main" class="wrapper">
+			<aside>
+				<input id='connect' class='button' type='submit' name='Connect' value='Connect' />
+				<input id='disconnect' class='button' type='submit' name='Disconnect' value='Disconnect' />
+				<input id='logfile' type='text' name='logfile' />
+				<input id='newOnly' type='checkbox' name='newOnly' />							
+			</aside>
+			<article>
+				<div id='messageBox'></div>
+				<div id='input'>
+					<div>
+						<input id='connect' class='button' type='submit' name='Connect'
+							value='Connect' />
+						<input id='disconnect' class='button' type='submit'
+							name='Disconnect' value='Disconnect' />
+						<input id='logfile' type='text' name='logfile' />
+						<input id='newOnly' type='checkbox' name='newOnly' />
+					</div>
+					<div>
+						<input id='pause' class='button' type='submit' name='Pause'
+							value='Pause' />
+						<input id='resume' class='button' type='submit' name='Resume'
+							value='Resume' />
+					</div>
+				</div>
+			</article>
+		</div>
+		<div id="footer-container">
+			<footer class="wrapper">
+				<h3>
+					A nice footer
+				</h3>
+			</footer>
+		</div>
+		<script src="js/script.js"></script>
+		<!--[if lt IE 7 ]>
+	<script src="js/libs/dd_belatedpng.js"></script>
+	<script> DD_belatedPNG.fix('img, .png_bg');</script>
+	<![endif]-->
+		<script type='text/javascript'>
+			$('connect').onclick = function(event) {
+				server.connect($F('logfile'), $F('newOnly'));
+				return false;
+			};
+			$('disconnect').onclick = function(event) {
+				server.disconnect();
+				return false;
+			};
+			$('pause').onclick = function(event) {
+				server.send($F('pause'));
+				return false;
+			};
+			$('resume').onclick = function(event) {
+				server.send($F('resume'));
+				return false;
+			};
+		</script>
+	</body>
+</html>
+
+

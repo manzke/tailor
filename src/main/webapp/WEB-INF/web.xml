@@ -6,7 +6,7 @@
 	<display-name>tailor</display-name>
 	<servlet>
 		<servlet-name>tailingwebsocket</servlet-name>
-		<servlet-class>com.saperion.html.tail.TailorWebSocketServlet</servlet-class>
+		<servlet-class>de.devsurf.html.tail.TailorWebSocketServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>tailingwebsocket</servlet-name>

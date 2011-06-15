@@ -1,4 +1,4 @@
-package com.saperion.html.tail;
+package de.devsurf.html.tail;
 
 import java.io.File;
 import java.io.FileOutputStream;
