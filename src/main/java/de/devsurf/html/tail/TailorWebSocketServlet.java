@@ -3,8 +3,6 @@ package de.devsurf.html.tail;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -24,7 +22,6 @@ public class TailorWebSocketServlet extends WebSocketServlet {
 			.getLogger(TailorWebSocketServlet.class);
 	private static final long serialVersionUID = -7289719281366784056L;
 
-	private final Set<TailorSocket> _members = new CopyOnWriteArraySet<TailorSocket>();
 	private ScheduledExecutorService executor = Executors
 			.newSingleThreadScheduledExecutor();
 
@@ -74,6 +71,7 @@ public class TailorWebSocketServlet extends WebSocketServlet {
 			if ("Pause".equalsIgnoreCase(data)) {
 				if (_scheduledJob != null) {
 					_scheduledJob.cancel(true);
+					_scheduledJob = null;
 					try {
 						_connection
 								.sendMessage("Sending Log Entries is paused.");
@@ -83,7 +81,7 @@ public class TailorWebSocketServlet extends WebSocketServlet {
 					}
 				}
 			} else if ("Resume".equalsIgnoreCase(data)) {
-				if (_scheduledJob != null) {
+				if (_scheduledJob == null) {
 					schedule();
 					try {
 						_connection
@@ -164,7 +162,6 @@ public class TailorWebSocketServlet extends WebSocketServlet {
 					}
 				};
 				schedule();
-				_members.add(this);
 				_connection = connection;
 			}
 		}
@@ -183,7 +180,6 @@ public class TailorWebSocketServlet extends WebSocketServlet {
 			if(_scheduledJob != null){
 				_scheduledJob.cancel(true);
 			}
-			_members.remove(this);
 		}
 
 		private void schedule() {

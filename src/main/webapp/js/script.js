@@ -42,7 +42,26 @@ var server = function(){
 				var messageBox = $('#messageBox')[0];
 				var spanText = document.createElement('span');
 				spanText.className = 'text';
-				spanText.innerHTML = m.data;
+				var data = m.data;
+				var lowerCaseData = data.toLowerCase();
+				
+				var index = lowerCaseData.indexOf($('#errortext').val());
+				if(index > 0){
+					data = data.fontcolor("red");
+				}else{
+					index = lowerCaseData.indexOf($('#warntext').val());
+					if(index > 0){
+						data = data.fontcolor("yellow");
+					}
+				}
+				
+				var pckge = $('#yourpackage').val();
+				index = lowerCaseData.indexOf(pckge);
+				if(index > 0){
+					data = data.replace(pckge, pckge.fontcolor('blue'));
+				}
+
+				spanText.innerHTML = data;
 				var lineBreak = document.createElement('br');
 				messageBox.appendChild(spanText);
 				messageBox.appendChild(lineBreak);
